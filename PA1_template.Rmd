@@ -26,7 +26,7 @@ ggplot(data=stepsPerDay, aes(x=steps)) + geom_histogram() + ggtitle("Distributio
 res <-stepsPerDay  %>% summarise(meanSteps = mean(steps), medianSteps = median(steps) )
 ```
 
-The mean total number of steps taken per day is `r format(round(res$meanSteps,2), nsmall=2)` and the median is `r format(round(res$medianSteps,2), nsmall=2)`.
+The mean total number of steps taken per day is `r as.integer(res$meanSteps)` and the median is `r as.integer(res$medianSteps)`.
 
 ## What is the average daily activity pattern?
 
@@ -47,8 +47,7 @@ There are `r nmissing` missing values in the dataset
 
 ```{r message = FALSE}
 # imputing the mean value for that 5-minute interval for missing values
-# The mean value for each interval is already computed in the dat dataframe
-actf <- act %>% mutate(steps = ifelse(is.na(steps), round(dat$meansteps[dat$interval == interval]), steps))
+actf <- act %>% inner_join(dat) %>% mutate(steps = ifelse(is.na(steps), round(meansteps), steps)) %>% select(-meansteps)
 stepsPerDay2 <- actf %>% group_by(date) %>% summarise(steps = sum(steps))
 ggplot(data=stepsPerDay2, aes(x=steps)) + geom_histogram() + ggtitle("Distribution of total number of steps taken per day after imputation")
 ```
@@ -58,7 +57,7 @@ ggplot(data=stepsPerDay2, aes(x=steps)) + geom_histogram() + ggtitle("Distributi
 res2 <- stepsPerDay2  %>% summarise(meanSteps = mean(steps), medianSteps = median(steps) )
 ```
 
-The mean total number of steps taken per day after imputation is `r format(round(res2$meanSteps,2), nsmall=2)` and the median is `r format(round(res$medianSteps2,2), nsmall=2)`.
+The mean total number of steps taken per day after imputation is `r as.integer(res2$meanSteps)` and the median is `r as.integer(res2$medianSteps)`.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
